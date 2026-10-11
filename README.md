@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-green.svg)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.20-purple.svg)](https://kotlinlang.org)
 [![Gradle](https://img.shields.io/badge/Gradle-8.9-brightgreen.svg)](https://gradle.org)
-[![Releases](https://img.shields.io/badge/APK_Releases-Part_1_to_6-orange.svg)](https://github.com/techgptx/Playlist/releases)
+[![Releases](https://img.shields.io/badge/APK_Releases-Part_1_to_7-orange.svg)](https://github.com/techgptx/Playlist/releases)
 
 Welcome to the official source code repository for the **JARVIS Android AI Assistant Series** by **Tech GPTx**!
 Every part in this playlist is organized into its own self-contained, ready-to-run Android Studio project.
@@ -48,9 +48,9 @@ All parts (Part 1 to Part 7) now feature an integrated, multi-layered security m
 
 ---
 
-## 📲 Direct APK Downloads (Parts 1 to 6)
+## 📲 Direct APK Downloads (Parts 1 to 7)
 
-Don't want to compile from source right now? Pre-built APKs for Parts 1 to 6 are available in the **[GitHub Releases](https://github.com/techgptx/Playlist/releases)** section:
+Don't want to compile from source right now? Pre-built APKs for Parts 1 to 7 are available in the **[GitHub Releases](https://github.com/techgptx/Playlist/releases)** section:
 
 | Part | Name | Features Highlight | APK Download |
 |---|---|---|---|
@@ -60,7 +60,7 @@ Don't want to compile from source right now? Pre-built APKs for Parts 1 to 6 are
 | **Part 4** | JARVIS-Part-4 | Ultra Low-Latency Audio Pipeline, Natural Barge-In | [Download APK](https://github.com/techgptx/Playlist/releases) |
 | **Part 5** | JARVIS-Part-5 | WhatsApp & YouTube System Automations, UI Polish | [Download APK](https://github.com/techgptx/Playlist/releases) |
 | **Part 6** | JARVIS-Part-6 | Real-time Live Screen-Sharing Vision & Reasoning | [Download APK](https://github.com/techgptx/Playlist/releases) |
-| **Part 7** | JARVIS-Part-7 | Agentic Workflows, 17 Floating Overlays, Sound FX | Build via Source Code |
+| **Part 7** | JARVIS-Part-7 | Agentic Workflows, 17 Floating Overlays, Sound FX | [Download APK](https://github.com/techgptx/Playlist/releases) |
 
 ---
 
