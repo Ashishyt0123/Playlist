@@ -653,6 +653,11 @@ class JarvisConversationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (!com.jarvis.assistant.security.AppIdentityVerifier.isTrustedRelease(this)) {
+            Log.e("JarvisService", "Blocked service start: release signing certificate did not match the configured pin")
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
         ensureMicrophoneForegroundService()
         acquireWakeLock()
 

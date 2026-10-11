@@ -1,8 +1,23 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.kapt")
+    id("kotlin-kapt")
 }
+
+fun configuredValue(name: String): String? =
+    providers.gradleProperty(name).orNull ?: providers.environmentVariable(name).orNull
+
+fun buildConfigString(value: String): String = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
+val releaseStorePath = configuredValue("JARVIS_RELEASE_STORE_FILE")
+val releaseStorePassword = configuredValue("JARVIS_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = configuredValue("JARVIS_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = configuredValue("JARVIS_RELEASE_KEY_PASSWORD")
+val releaseCertSha256 = configuredValue("JARVIS_RELEASE_CERT_SHA256")?.replace(":", "")?.uppercase().orEmpty()
+val developerName = configuredValue("JARVIS_DEVELOPER_NAME")?.ifBlank { null } ?: "Tech GPTx"
+val copyrightOwner = configuredValue("JARVIS_COPYRIGHT_OWNER")?.ifBlank { null } ?: "Tech GPTx"
+val verificationEndpoint = configuredValue("JARVIS_VERIFICATION_ENDPOINT").orEmpty()
+val releaseSigningReady = listOf(releaseStorePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword).all { !it.isNullOrBlank() }
 
 android {
     namespace = "com.jarvis.assistant"
@@ -16,12 +31,28 @@ android {
         versionName = "1.8.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "DEVELOPER_NAME", buildConfigString(developerName.ifBlank { "Unverified developer" }))
+        buildConfigField("String", "COPYRIGHT_OWNER", buildConfigString(copyrightOwner.ifBlank { "Unconfigured" }))
+        buildConfigField("String", "PINNED_RELEASE_CERT_SHA256", buildConfigString(releaseCertSha256))
+        buildConfigField("String", "VERIFICATION_ENDPOINT", buildConfigString(verificationEndpoint))
+    }
+
+    signingConfigs {
+        create("release") {
+            if (releaseSigningReady) {
+                storeFile = file(releaseStorePath!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
-            signingConfig = signingConfigs.getByName("debug")
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -40,7 +71,32 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
+
+    lint {
+        // AndroidX Lifecycle 2.8.6's NullSafeMutableLiveData detector crashes under this project's Kotlin 2.0 UAST.
+        // Keep all other lint checks enabled while that upstream detector is incompatible.
+        disable += "NullSafeMutableLiveData"
+    }
+}
+
+tasks.register("verifyReleaseSecurityInputs") {
+    doLast {
+        check(releaseSigningReady) {
+            "Release signing is not configured. Set JARVIS_RELEASE_STORE_FILE, JARVIS_RELEASE_STORE_PASSWORD, JARVIS_RELEASE_KEY_ALIAS, and JARVIS_RELEASE_KEY_PASSWORD in the local environment or Gradle user properties."
+        }
+        check(releaseCertSha256.matches(Regex("[A-F0-9]{64}"))) {
+            "Set JARVIS_RELEASE_CERT_SHA256 to the SHA-256 fingerprint of the release signing certificate."
+        }
+        check(developerName.isNotBlank() && copyrightOwner.isNotBlank()) {
+            "Set JARVIS_DEVELOPER_NAME and JARVIS_COPYRIGHT_OWNER to the verified publisher identity."
+        }
+    }
+}
+
+tasks.matching { it.name == "packageRelease" }.configureEach {
+    dependsOn("verifyReleaseSecurityInputs")
 }
 
 dependencies {

@@ -52,13 +52,20 @@ class ApiConnectionActivity : AppCompatActivity() {
         binding.etApiKey.setText(preferences.apiKey)
         binding.etCustomEndpoint.setText(preferences.customEndpoint)
 
+        if (!preferences.canStoreApiKeySecurely) {
+            binding.tvLiveStatus.text = "SECURE STORAGE UNAVAILABLE • API KEY DISABLED"
+            binding.viewStatusDot.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EF4444"))
+        }
+
         when (preferences.aiModel) {
             GeminiConstants.MODEL_3_8_LIVE -> binding.rbModelFlash20.isChecked = true
             GeminiConstants.MODEL_3_1_FLASH_AGENT -> binding.rbModelFlash15.isChecked = true
             else -> binding.rbModelFlashThinking.isChecked = true
         }
 
-        if (preferences.apiKey.isNotBlank()) {
+        if (!preferences.canStoreApiKeySecurely) {
+            // Keep the secure-storage warning set above.
+        } else if (preferences.apiKey.isNotBlank()) {
             binding.tvLiveStatus.text = "KEY CONFIGURED • READY"
             binding.viewStatusDot.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#22C55E"))
         } else {
@@ -153,7 +160,12 @@ class ApiConnectionActivity : AppCompatActivity() {
             else -> GeminiConstants.MODEL_3_1_FLASH
         }
 
-        preferences.apiKey = key
+        try {
+            preferences.apiKey = key
+        } catch (e: IllegalStateException) {
+            Snackbar.make(binding.root, e.message ?: "Secure key storage is unavailable.", Snackbar.LENGTH_LONG).show()
+            return
+        }
         preferences.aiModel = selectedModel
         preferences.customEndpoint = customEp
         com.jarvis.assistant.background.JarvisConversationService.clearLiveError()

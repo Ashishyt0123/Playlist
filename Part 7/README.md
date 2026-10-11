@@ -36,7 +36,22 @@ The Gradle wrapper is included in this project. Use `gradlew.bat` on Windows or 
 ./gradlew :app:assembleRelease
 ```
 
-Build outputs are written under `app/build/outputs/` and are generated files, not source files. The current release build type uses the debug signing configuration; use a dedicated release keystore and protected signing properties before distributing an APK publicly.
+Build outputs are written under `app/build/outputs/` and are generated files, not source files. Release builds enable R8 and resource shrinking. `assembleRelease` intentionally refuses to package unless a dedicated keystore, its SHA-256 certificate pin, and publisher metadata are configured. Never commit keystores or passwords.
+
+Create and protect a release key outside this repository, then supply these values only in the local shell or Gradle user properties:
+
+```powershell
+$env:JARVIS_RELEASE_STORE_FILE = 'C:\secure\jarvis-release.jks'
+$env:JARVIS_RELEASE_STORE_PASSWORD = '<local secret>'
+$env:JARVIS_RELEASE_KEY_ALIAS = 'jarvis-release'
+$env:JARVIS_RELEASE_KEY_PASSWORD = '<local secret>'
+$env:JARVIS_RELEASE_CERT_SHA256 = '<64 hex characters from keytool -list -v>'
+$env:JARVIS_DEVELOPER_NAME = 'TechGpt X'
+$env:JARVIS_COPYRIGHT_OWNER = 'TechGpt X'
+.\gradlew.bat :app:assembleRelease
+```
+
+The certificate fingerprint must be calculated from the same key used to sign the APK. This project currently has no deployed verification backend or agreed verification API protocol. Local signer pinning and APK signatures do not provide server-side authentication, Play Integrity attestation, or rate limiting; the app identity screen reports remote verification as unavailable until that service is implemented and deployed.
 
 ## Repository layout
 

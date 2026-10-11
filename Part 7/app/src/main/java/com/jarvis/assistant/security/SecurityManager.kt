@@ -4,51 +4,28 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Base64
 import java.security.MessageDigest
 import kotlin.system.exitProcess
 
 /**
- * ╔══════════════════════════════════════════════════════════════╗
- * ║           JARVIS ASSISTANT — SECURITY MODULE                 ║
- * ║   Original Developer  : Tech GPTx                           ║
- * ║   Copyright © 2026    : Tech GPTx. All Rights Reserved.     ║
- * ║   GitHub              : https://github.com/techgptx/Playlist ║
- * ║   Content Creators    : Must give 100% shoutout to Tech GPTx ║
- * ╚══════════════════════════════════════════════════════════════╝
- *
- * Anti-Clone System:
- *  - Verifies the app's package name is the original one
- *  - Verifies the APK signing certificate at runtime
- *  - Blocks tampered / cloned APKs from running
- *
- * TAMCL v1.0 License: Anyone who uses this code to create content
- * MUST give 100% shoutout / credit to "Tech GPTx" in their video.
+ * JARVIS ASSISTANT — SECURITY MODULE
+ * Developer       : Tech GPTx
+ * Copyright © 2026: Tech GPTx. All Rights Reserved.
+ * GitHub          : https://github.com/techgptx/Playlist
  */
 object SecurityManager {
 
-    // ── Developer Identity ────────────────────────────────────────
     const val DEVELOPER_NAME    = "Tech GPTx"
     const val COPYRIGHT_NOTICE  = "Copyright © 2026 Tech GPTx. All Rights Reserved."
     const val GITHUB_REPO       = "https://github.com/techgptx/Playlist"
     const val LICENSE_NAME      = "TAMCL v1.0 — Content creators MUST credit Tech GPTx"
 
-    // ── Anti-Clone: expected package name ────────────────────────
     private const val EXPECTED_PACKAGE = "com.jarvis.assistant"
 
-    /**
-     * Call this once inside Application.onCreate() or MainActivity.onCreate()
-     * before any other initialisation.
-     */
     fun verify(context: Context) {
         checkPackageName(context)
-        // Note: To enable APK Signature Lock (Feature 2), generate a .jks key,
-        // sign your APK, compute its SHA-256 fingerprint, paste it below and
-        // uncomment checkSignature(). See README for full guide.
-        // checkSignature(context)
     }
 
-    // ── Package-name anti-clone check ────────────────────────────
     private fun checkPackageName(context: Context) {
         if (context.packageName != EXPECTED_PACKAGE) {
             showTamperAlert(
@@ -62,14 +39,6 @@ object SecurityManager {
         }
     }
 
-    // ── APK Signature Lock (optional — enable after signing) ─────
-    /**
-     * To enable:
-     *  1. Generate your keystore:  keytool -genkey -v -keystore techgptx.jks ...
-     *  2. Sign your APK with that keystore.
-     *  3. Get the SHA-256 of your signing cert and paste it in EXPECTED_SHA256.
-     *  4. Uncomment the call to checkSignature() in verify() above.
-     */
     @Suppress("unused")
     private fun checkSignature(context: Context) {
         val EXPECTED_SHA256 = "PASTE_YOUR_APK_SHA256_FINGERPRINT_HERE"
@@ -112,7 +81,6 @@ object SecurityManager {
         }
     }
 
-    // ── Alert + force-quit ───────────────────────────────────────
     private fun showTamperAlert(context: Context, title: String, message: String) {
         try {
             AlertDialog.Builder(context)

@@ -182,6 +182,14 @@ class SettingsFragment : Fragment() {
             startActivity(Intent(requireContext(), PrivacyShieldActivity::class.java))
         }
 
+        binding.rowAppIdentity.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("JARVIS App Identity")
+                .setMessage(com.jarvis.assistant.security.AppIdentityVerifier.report(requireContext()))
+                .setPositiveButton("Close", null)
+                .show()
+        }
+
         // Social Media Community Buttons
         binding.btnSocialTelegram.setOnClickListener {
             openUrl("https://t.me/+sYana61LvHdmZmE1")

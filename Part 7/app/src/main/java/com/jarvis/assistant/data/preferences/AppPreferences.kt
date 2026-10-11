@@ -2,6 +2,9 @@ package com.jarvis.assistant.data.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jarvis.assistant.data.model.ChatTurn
@@ -9,9 +12,25 @@ import com.jarvis.assistant.data.model.GeminiConstants
 
 class AppPreferences(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    private val secureApiPrefs: SharedPreferences? = try {
+        val masterKey = MasterKey.Builder(context.applicationContext)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        EncryptedSharedPreferences.create(
+            context.applicationContext,
+            ENCRYPTED_API_PREF_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    } catch (e: Exception) {
+        Log.e(TAG, "Secure API-key storage could not be initialized", e)
+        null
+    }
     private val gson = Gson()
 
     init {
+        migrateApiKeyToEncryptedStorage()
         val current = prefs.getString(KEY_MODEL, null)
         if (current == null || current !in GeminiConstants.SUPPORTED_MODELS) {
             prefs.edit().putString(KEY_MODEL, GeminiConstants.DEFAULT_MODEL).apply()
@@ -20,6 +39,8 @@ class AppPreferences(context: Context) {
 
     companion object {
         private const val PREF_NAME = "jarvis_prefs"
+        private const val ENCRYPTED_API_PREF_NAME = "jarvis_secure_api_prefs"
+        private const val TAG = "AppPreferences"
         private const val KEY_API_KEY = "key_api_key"
         private const val KEY_MODEL = "key_model"
         private const val KEY_VOICE = "key_voice"
@@ -150,8 +171,34 @@ class AppPreferences(context: Context) {
     }
 
     var apiKey: String
-        get() = prefs.getString(KEY_API_KEY, "")?.trim() ?: ""
-        set(value) = prefs.edit().putString(KEY_API_KEY, value.trim()).apply()
+        get() = secureApiPrefs?.getString(KEY_API_KEY, "")?.trim() ?: ""
+        set(value) {
+            val secure = checkNotNull(secureApiPrefs) { "Secure API-key storage is unavailable on this device." }
+            val clean = value.trim()
+            val saved = if (clean.isEmpty()) secure.edit().remove(KEY_API_KEY).commit()
+            else secure.edit().putString(KEY_API_KEY, clean).commit()
+            check(saved) { "Could not save API key to encrypted storage." }
+        }
+
+    val canStoreApiKeySecurely: Boolean get() = secureApiPrefs != null
+
+    private fun migrateApiKeyToEncryptedStorage() {
+        val legacyKey = prefs.getString(KEY_API_KEY, null)?.trim().orEmpty()
+        if (legacyKey.isEmpty()) return
+        val secure = secureApiPrefs ?: run {
+            prefs.edit().remove(KEY_API_KEY).commit()
+            return
+        }
+        try {
+            val existing = secure.getString(KEY_API_KEY, null)
+            if (existing.isNullOrEmpty()) {
+                check(secure.edit().putString(KEY_API_KEY, legacyKey).commit())
+            }
+            if (!secure.getString(KEY_API_KEY, null).isNullOrEmpty()) prefs.edit().remove(KEY_API_KEY).commit()
+        } catch (e: Exception) {
+            Log.e(TAG, "Legacy API-key migration to encrypted storage failed", e)
+        }
+    }
 
     var aiModel: String
         get() {

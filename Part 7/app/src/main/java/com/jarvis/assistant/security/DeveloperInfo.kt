@@ -2,12 +2,7 @@ package com.jarvis.assistant.security
 
 /**
  * Permanent Developer Identity — Tech GPTx
- *
- * TAMCL v1.0 License:
- *   Any content creator who uses this source code to create
- *   YouTube / social-media videos MUST give 100% shoutout /
- *   credit to "Tech GPTx" in their video description and verbally
- *   in the video. Failure to do so is a license violation.
+ * TAMCL v1.0 License: Content creators MUST credit Tech GPTx in any video using this code.
  */
 object DeveloperInfo {
     const val DEVELOPER_NAME      = "Tech GPTx"

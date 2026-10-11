@@ -150,6 +150,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (!com.jarvis.assistant.security.AppIdentityVerifier.isTrustedRelease(this)) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("App integrity check failed")
+                .setMessage("This JARVIS build is not signed with the configured official release certificate. Sensitive features have been blocked.")
+                .setCancelable(false)
+                .setPositiveButton("Close") { _, _ -> finish() }
+                .show()
+            return
+        }
+
         com.jarvis.assistant.util.ThemeManager.applyDynamicBackground(binding.rootMainLayout)
 
         currentTab = savedInstanceState?.getInt("CURRENT_TAB", TAB_HOME) ?: TAB_HOME
