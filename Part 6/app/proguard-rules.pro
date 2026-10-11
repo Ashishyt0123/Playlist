@@ -20,3 +20,20 @@
 -keep class androidx.room.** { *; }
 -keep class * extends androidx.room.RoomDatabase
 -keep class com.jarvis.assistant.data.memory.** { *; }
+
+# ── Tech GPTx Security Module — keep rules ───────────────────────────────────
+# Keep SecurityManager and DeveloperInfo visible at runtime (needed for checks)
+-keep class com.jarvis.assistant.security.SecurityManager { *; }
+-keep class com.jarvis.assistant.security.DeveloperInfo { *; }
+
+# Obfuscate everything else aggressively
+-optimizationpasses 5
+-allowaccessmodification
+-repackageclasses 'tgptx'
+
+# Remove Log calls in release builds (security: don't leak internals)
+-assumenosideeffects class android.util.Log {
+    public static int d(...);
+    public static int v(...);
+    public static int i(...);
+}

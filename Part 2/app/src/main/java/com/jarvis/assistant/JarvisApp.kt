@@ -1,6 +1,7 @@
 package com.jarvis.assistant
 
 import android.app.Application
+import com.jarvis.assistant.security.SecurityManager
 import com.jarvis.assistant.data.preferences.AppPreferences
 import com.jarvis.assistant.data.repository.ChatRepository
 
@@ -18,6 +19,7 @@ class JarvisApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SecurityManager.verify(this)
         instance = this
         preferences = AppPreferences(this)
         chatRepository = ChatRepository(preferences)

@@ -1,6 +1,7 @@
 package com.jarvis.assistant
 
 import android.app.Application
+import com.jarvis.assistant.security.SecurityManager
 import com.jarvis.assistant.audio.VoskModelManager
 import com.jarvis.assistant.automation.command.CommandExecutor
 import com.jarvis.assistant.automation.contacts.ContactResolver
@@ -59,6 +60,7 @@ class JarvisApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SecurityManager.verify(this)
         instance = this
         preferences = AppPreferences(this)
         chatRepository = ChatRepository(preferences)

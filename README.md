@@ -25,6 +25,29 @@ Every part in this playlist is organized into its own self-contained, ready-to-r
 
 ---
 
+## 🛡️ Built-in Security Architecture & Anti-Clone Protection
+
+All parts (Part 1 to Part 7) now feature an integrated, multi-layered security module:
+
+1. **Permanent Developer Identity (`DeveloperInfo.kt`)**:
+   - Hardcoded developer verification: **Tech GPTx © 2026**.
+   - Official App ID: `com.jarvis.assistant`.
+   - Built-in license notice requiring mandatory shoutouts in video productions.
+
+2. **Anti-Clone Guard (`SecurityManager.kt`)**:
+   - Runtime package name validation (`com.jarvis.assistant`).
+   - If a cloned or repackaged APK with a modified package name is executed, the app immediately halts with a tamper alert directing users to the official repo.
+
+3. **APK Signature Lock Ready**:
+   - Built-in certificate verification logic (`checkSignature()`).
+   - Once signed with your private keystore (`.jks`), pasting your SHA-256 fingerprint permanently binds the app to your signature, preventing any modified or re-signed copies from launching.
+
+4. **R8 Code Obfuscation & Anti-Tampering (`proguard-rules.pro`)**:
+   - `isMinifyEnabled = true` enabled on all parts for release builds.
+   - Aggressive class repackaging (`tgptx`), 5-pass optimization, and removal of internal debug logs (`Log.d`, `Log.v`, `Log.i`) to prevent reverse engineering.
+
+---
+
 ## 📲 Direct APK Downloads (Parts 1 to 6)
 
 Don't want to compile from source right now? Pre-built APKs for Parts 1 to 6 are available in the **[GitHub Releases](https://github.com/techgptx/Playlist/releases)** section:
