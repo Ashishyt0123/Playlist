@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "JarvisAssistant"
+rootProject.name = "JARVIS-Part-4"
 include(":app")
